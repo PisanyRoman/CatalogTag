@@ -1,0 +1,95 @@
+{{ header }}
+<div id="maincattag" class="container">
+ <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+    <h2>{{ title }}</h2>
+    {{ content_bottom }}
+    {% if productstags %}
+    <div class="row">
+        <div class="col-md-2 col-sm-6 hidden-xs">
+          <div class="btn-group btn-group-sm">
+            <button type="button" id="list-view" class="btn btn-default" data-toggle="tooltip" title="{{ button_list }}"><i class="fa fa-th-list"></i></button>
+            <button type="button" id="grid-view" class="btn btn-default" data-toggle="tooltip" title="{{ button_grid }}"><i class="fa fa-th"></i></button>
+          </div>
+        </div> 
+    </div>
+    {% for  childcattag in  childcattags %}
+    {% set cati = 0 %} 
+        {% for productstag in productstags %}
+        {% if productstag.categories==childcattag.name %}
+            {% if cati==0 %}
+            <h3>{{ childcattag.name }}</h3>
+            <hr>
+            <div class="cleatdiv"></div>
+            {% set cati = 1 %}
+            {% endif %}
+        <div class="product-layout product-list col-xs-12">
+            <div class="product-thumb">
+                <div class="image"><a href="{{ productstag.href }}"><img src="{{ productstag.thumb }}" alt="{{ productstag.name }}" title="{{ productstag.name }}" class="img-responsive" /></a></div>
+                    <div>
+                        <div class="caption">
+                            <h4><a href="{{ productstag.href }}">{{ productstag.name }}</a></h4>
+                            <p>{{ productstag.description }}</p>
+                            {% if productstag.price %}
+                            <p class="price">
+			                    {% if price > 0 %}
+                                    {% if not productstag.special %}
+                                    {{ productstag.price }}
+                                    {% else %} <span class="price-new">{{ productstag.special }}</span> <span class="price-old">{{ productstag.price }}</span> {% endif %}
+                                    {% if productstag.tax %} <span class="price-tax">{{ text_tax }} {{ productstag.tax }}</span> {% endif %} 
+			                        {% else %}	
+			                        {% set optpr = 0 %}  
+                                    {% for options_p in cat_options %}
+                                    {% if options_p.product_id == productstag.product_id and options_p.price != 0 %} 
+                                        {% if optpr > options_p.price or optpr == 0 %} 
+                                        {% set optpr = options_p.price %}   
+                                        {% endif %} 
+                                    {% endif %} 
+                                    {% endfor %} 
+                                    {% if optpr != 0 %} 
+                                    от {{ optpr }} руб.
+                                    {% else %}	
+                                    По запросу
+                                    {% endif %}   
+                                {% endif %} 
+                            </p>
+                            {% endif %}
+                            {% if productstag.rating %}
+                            <div class="rating"> {% for i in 1..5 %}
+                            {% if productstag.rating < i %} <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-2x"></i></span> {% else %} <span class="fa fa-stack"><i class="fa fa-star fa-stack-2x"></i><i class="fa fa-star-o fa-stack-2x"></i></span>{% endif %}
+                            {% endfor %} </div>
+                            {% endif %} 
+                    </div>
+                    <div class="button-group">
+                    {% if price > 0 %}
+                    <button type="button" class="buttoncart" onclick="cart.add('{{ productstag.product_id }}', '{{ productstag.minimum }}');"><i class="fa fa-shopping-cart"></i> <span>{{ button_cart }}</span></button>
+                    {% else %}
+                    <a class="pricelink" href="{{ productstag.href }}">ПЕРЕЙТИ</a>
+                    {% endif %} 
+                    <a class="buttonwishlist" onclick="wishlist.add('{{ productstag.product_id }}');"><img src="/image/wishlistmin.png" alt="{{ button_wishlist }}">В&nbsp;закладки</a>
+				    <a class="buttoncompare" onclick="compare.add('{{ productstag.product_id }}');"><img src="/image/comparemin.png" alt="{{ button_compare }}">В&nbsp;сравнение</a>
+			        </div>
+                </div>
+          </div>
+    </div>
+    {% endif %}
+{% endfor %}
+<div class="cleatdiv"></div>   
+{% endfor %}
+{% endif %} 
+{{ column_right }}
+</div>
+</div>
+{{ footer }}
